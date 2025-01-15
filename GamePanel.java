@@ -42,6 +42,11 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
     super.paint(g);
     g.setFont(new Font("Courier New", Font.BOLD, 25));
     g.drawString(Integer.toString(score), getWidth()/2 - 5, 100);
+    
+    // Draw lives
+    g.setFont(new Font("Courier New", Font.BOLD, 20));
+    g.drawString("Lives: " + dino.getLives(), 50, 50);
+    
     ground.create(g);
     dino.create(g);
     obstacles.create(g);
@@ -71,9 +76,14 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
     if(obstacles.hasCollided()) {
       dino.die();
       repaint();
-      running = false;
-      gameOver = true;
-      System.out.println("collide");
+      if (dino.isGameOver()) {
+        running = false;
+        gameOver = true;
+        System.out.println("Game Over!");
+      } else {
+        obstacles.resume();
+        System.out.println("Life lost!");
+      }
     }
     // game complete condition
   }
@@ -81,6 +91,7 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
   public void reset() {
     score = 0;
     System.out.println("reset");
+    dino.reset();
     obstacles.resume();
     gameOver = false;
   }

@@ -25,8 +25,8 @@ public class Dino {
                     NO_FOOT = 3;
   
   private static int state;
-
   private int foot;
+  private int lives;
 
   static BufferedImage image;
   BufferedImage leftFootDino;
@@ -47,6 +47,7 @@ public class Dino {
 
     state = 1;
     foot = NO_FOOT;
+    lives = 3;
   }
 
   public void create(Graphics g) {
@@ -100,7 +101,23 @@ public class Dino {
   }
 
   public void die() {
+    lives--;
     state = DIE;
+  }
+
+  public boolean isGameOver() {
+    return lives <= 0;
+  }
+
+  public int getLives() {
+    return lives;
+  }
+
+  public void reset() {
+    if (lives <= 0) {
+      lives = 3;
+    }
+    state = RUNNING;
   }
 
   public static Rectangle getDino() {
