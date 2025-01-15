@@ -14,6 +14,7 @@ public class Obstacles {
     BufferedImage image;
     int x;
     int y;
+    boolean destroyed = false;
 
     Rectangle getObstacle() {
       Rectangle obstacle = new Rectangle();
@@ -47,21 +48,16 @@ public class Obstacles {
     imageList.add(new Resource().getResourceImage("../images/Cactus-2.png"));
     imageList.add(new Resource().getResourceImage("../images/Cactus-2.png"));
     imageList.add(new Resource().getResourceImage("../images/Cactus-1.png"));
-    // imageList.add(new Resource().getResourceImage("../images/Cactus-3.png"));
-    // imageList.add(new Resource().getResourceImage("../images/Cactus-4.png"));
     imageList.add(new Resource().getResourceImage("../images/Cactus-5.png"));
     
     int x = firstX;
     
     for(BufferedImage bi : imageList) {
-      
       Obstacle ob = new Obstacle();
-      
       ob.image = bi;
       ob.x = x;
       ob.y = Ground.GROUND_Y - bi.getHeight() + 5;
       x += obstacleInterval;
-      
       obList.add(ob);
     }
   }
@@ -85,19 +81,31 @@ public class Obstacles {
       obList.add(firstOb);
     }
   }
+
+  public void checkBulletCollisions(ArrayList<Bullet> bullets) {
+    for (Bullet bullet : bullets) {
+      if (bullet.isActive()) {
+        for (Obstacle obstacle : obList) {
+          if (!obstacle.destroyed && obstacle.getObstacle().intersects(bullet.getBounds())) {
+            obstacle.destroyed = true;
+            bullet.deactivate();
+          }
+        }
+      }
+    }
+  }
   
   public void create(Graphics g) {
     for(Obstacle ob : obList) {
-      g.setColor(Color.black);
-      // g.drawRect(ob.getObstacle().x, ob.getObstacle().y, ob.getObstacle().width, ob.getObstacle().height);
-      g.drawImage(ob.image, ob.x, ob.y, null);
+      if (!ob.destroyed) {
+        g.drawImage(ob.image, ob.x, ob.y, null);
+      }
     }
   }
   
   public boolean hasCollided() {
     for(Obstacle ob : obList) {
-      if(Dino.getDino().intersects(ob.getObstacle())) {
-        System.out.println("Dino = " + Dino.getDino() + "\nObstacle = " + ob.getObstacle() + "\n\n");
+      if (!ob.destroyed && Dino.getDino().intersects(ob.getObstacle())) {
         blockedAt = ob;
         return true;
       }   
@@ -106,21 +114,16 @@ public class Obstacles {
   }
 
   public void resume() {
-    // this.obList = null;
     int x = firstX/2;   
     obList = new ArrayList<Obstacle>();
     
     for(BufferedImage bi : imageList) {
-      
       Obstacle ob = new Obstacle();
-      
       ob.image = bi;
       ob.x = x;
       ob.y = Ground.GROUND_Y - bi.getHeight() + 5;
       x += obstacleInterval;
-      
       obList.add(ob);
     }
   }
-  
 }

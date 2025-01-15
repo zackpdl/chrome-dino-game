@@ -4,9 +4,9 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import components.Ground;
-import javafx.scene.paint.Color;
 import utility.Resource;
 
 public class Dino {
@@ -26,7 +26,9 @@ public class Dino {
   
   private static int state;
   private int foot;
-  private int lives;
+  private ArrayList<Bullet> bullets = new ArrayList<>();
+  private long lastShotTime = 0;
+  private static final long SHOOT_COOLDOWN = 500; // 500ms cooldown
 
   static BufferedImage image;
   BufferedImage leftFootDino;
@@ -47,18 +49,13 @@ public class Dino {
 
     state = 1;
     foot = NO_FOOT;
-    lives = 3;
   }
 
   public void create(Graphics g) {
     dinoBottom = dinoTop + image.getHeight();
 
-    // g.drawRect(getDino().x, getDino().y, getDino().width, getDino().height);
-
     switch(state) {
-
       case STAND_STILL:
-        System.out.println("stand");
         g.drawImage(image, dinoStartX, dinoTopY, null);
         break;
 
@@ -98,26 +95,42 @@ public class Dino {
         g.drawImage(deadDino, dinoStartX, dinoTop, null);    
         break;     
     }
+
+    // Draw bullets
+    Iterator<Bullet> bulletIterator = bullets.iterator();
+    while (bulletIterator.hasNext()) {
+      Bullet bullet = bulletIterator.next();
+      if (bullet.isActive()) {
+        bullet.draw(g);
+      }
+    }
+  }
+
+  public void shoot() {
+    long currentTime = System.currentTimeMillis();
+    if (currentTime - lastShotTime >= SHOOT_COOLDOWN && state != DIE) {
+      bullets.add(new Bullet(dinoEndX, dinoTop + image.getHeight()/2));
+      lastShotTime = currentTime;
+    }
+  }
+
+  public void updateBullets() {
+    Iterator<Bullet> bulletIterator = bullets.iterator();
+    while (bulletIterator.hasNext()) {
+      Bullet bullet = bulletIterator.next();
+      bullet.update();
+      if (!bullet.isActive()) {
+        bulletIterator.remove();
+      }
+    }
+  }
+
+  public ArrayList<Bullet> getBullets() {
+    return bullets;
   }
 
   public void die() {
-    lives--;
     state = DIE;
-  }
-
-  public boolean isGameOver() {
-    return lives <= 0;
-  }
-
-  public int getLives() {
-    return lives;
-  }
-
-  public void reset() {
-    if (lives <= 0) {
-      lives = 3;
-    }
-    state = RUNNING;
   }
 
   public static Rectangle getDino() {
@@ -144,9 +157,4 @@ public class Dino {
     topPointReached = false;
     state = JUMPING;
   }
-
-  private class DinoImages {
-
-  }
-
 }
