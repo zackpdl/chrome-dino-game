@@ -40,32 +40,10 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
     
     setSize(WIDTH, HEIGHT);
     setVisible(true);
-    initializeBackgroundMusic();
   }
 
-  private void initializeBackgroundMusic() {
-    try {
-      AudioInputStream audioStream = AudioSystem.getAudioInputStream(getClass().getResource("../sounds/background.wav"));
-      backgroundMusic = AudioSystem.getClip();
-      backgroundMusic.open(audioStream);
-      backgroundMusic.loop(Clip.LOOP_CONTINUOUSLY);
-    } catch (Exception e) {
-      System.out.println("Error loading background music: " + e.getMessage());
-    }
-  }
-
-  private void startBackgroundMusic() {
-    if (backgroundMusic != null && !backgroundMusic.isRunning()) {
-      backgroundMusic.setFramePosition(0);
-      backgroundMusic.start();
-    }
-  }
-
-  private void stopBackgroundMusic() {
-    if (backgroundMusic != null && backgroundMusic.isRunning()) {
-      backgroundMusic.stop();
-      backgroundMusic.close();
-    }
+  public void setBackgroundMusic(Clip music) {
+    this.backgroundMusic = music;
   }
 
   public void setGameOverListener(GameOverListener listener) {
@@ -105,7 +83,6 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
   
   public void run() {
     running = true;
-    startBackgroundMusic();
 
     while(running) {
       updateGame();
@@ -133,7 +110,6 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
         repaint();
         running = false;
         gameOver = true;
-        stopBackgroundMusic();
         System.out.println("Game Over - No lives remaining");
       } else {
         obstacles.resume();
@@ -153,7 +129,6 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
   public void keyTyped(KeyEvent e) {
     if(e.getKeyChar() == ' ') {    
       if(gameOver) {
-        stopBackgroundMusic();
         if (gameOverListener != null) {
           gameOverListener.onGameOver();
         }

@@ -41,10 +41,12 @@ public class UserInterface {
     });
     
     mainMenu.getStartButton().addActionListener(e -> {
+      gamePanel.setBackgroundMusic(mainMenu.getBackgroundMusic());
       startGame();
     });
     
     mainMenu.getExitButton().addActionListener(e -> {
+      mainMenu.stopMusic();
       System.exit(0);
     });
   }
