@@ -36,20 +36,22 @@ public class Dino {
   BufferedImage deadDino;
 
   public Dino() {
-    image = new Resource().getResourceImage("../images/Dino-stand.png");
-    leftFootDino = new Resource().getResourceImage("../images/Dino-left-up.png");
-    rightFootDino = new Resource().getResourceImage("../images/Dino-right-up.png");
-    deadDino = new Resource().getResourceImage("../images/Dino-big-eyes.png");
+    image = new Resource().getResourceImage("../images/naruto-stand.png");
+    leftFootDino = new Resource().getResourceImage("../images/naruto-run-1.png");
+    rightFootDino = new Resource().getResourceImage("../images/naruto-run-2.png");
+    deadDino = new Resource().getResourceImage("../images/naruto-dead.png");
 
-    dinoBaseY = Ground.GROUND_Y + 5;
-    dinoTopY = Ground.GROUND_Y - image.getHeight() + 5;
-    dinoStartX = 100;
+    // Lowering the Dino by increasing the Y values
+    dinoBaseY = Ground.GROUND_Y + 20; // Increased from +5 to +20
+    dinoTopY = Ground.GROUND_Y - image.getHeight() + 20; // Increased from +5 to +20
+    dinoStartX = 200;
     dinoEndX = dinoStartX + image.getWidth();
     topPoint = dinoTopY - 120;
 
-    state = 1;
+    state = STAND_STILL;
     foot = NO_FOOT;
-  }
+}
+
 
   public void create(Graphics g) {
     dinoBottom = dinoTop + image.getHeight();
@@ -139,10 +141,10 @@ public class Dino {
 
     if(state == JUMPING && !topPointReached) dino.y = dinoTop - jumpFactor;
     else if(state == JUMPING && topPointReached) dino.y = dinoTop + jumpFactor;
-    else if(state != JUMPING) dino.y = dinoTop;
+    else if(state != JUMPING) dino.y = dinoTop ;
 
-    dino.width = image.getWidth();
-    dino.height = image.getHeight();
+    dino.width = (int) (image.getWidth() * 0.6); // 80% of the original width
+    dino.height = (int) (image.getHeight() * 0.6); // 80% of the original height
 
     return dino;
   }
