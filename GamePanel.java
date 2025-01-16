@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
+import javax.sound.sampled.*;
 
 import components.Ground;
 import components.Dino;
@@ -25,6 +26,7 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
   private int score;
   private int lives = 3;
   private GameOverListener gameOverListener;
+  private Clip backgroundMusic;
   
   public GamePanel() {
     WIDTH = UserInterface.WIDTH;
@@ -38,6 +40,32 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
     
     setSize(WIDTH, HEIGHT);
     setVisible(true);
+    initializeBackgroundMusic();
+  }
+
+  private void initializeBackgroundMusic() {
+    try {
+      AudioInputStream audioStream = AudioSystem.getAudioInputStream(getClass().getResource("../sounds/background.wav"));
+      backgroundMusic = AudioSystem.getClip();
+      backgroundMusic.open(audioStream);
+      backgroundMusic.loop(Clip.LOOP_CONTINUOUSLY);
+    } catch (Exception e) {
+      System.out.println("Error loading background music: " + e.getMessage());
+    }
+  }
+
+  private void startBackgroundMusic() {
+    if (backgroundMusic != null && !backgroundMusic.isRunning()) {
+      backgroundMusic.setFramePosition(0);
+      backgroundMusic.start();
+    }
+  }
+
+  private void stopBackgroundMusic() {
+    if (backgroundMusic != null && backgroundMusic.isRunning()) {
+      backgroundMusic.stop();
+      backgroundMusic.close();
+    }
   }
 
   public void setGameOverListener(GameOverListener listener) {
@@ -47,11 +75,9 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
   public void paint(Graphics g) {
     super.paint(g);
     
-    // Draw score
     g.setFont(new Font("Courier New", Font.BOLD, 25));
     g.drawString(Integer.toString(score), getWidth()/2 - 5, 100);
     
-    // Draw lives
     g.setFont(new Font("Arial", Font.BOLD, 20));
     g.setColor(Color.RED);
     g.drawString("Lives: " + lives, 20, 30);
@@ -79,6 +105,7 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
   
   public void run() {
     running = true;
+    startBackgroundMusic();
 
     while(running) {
       updateGame();
@@ -106,6 +133,7 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
         repaint();
         running = false;
         gameOver = true;
+        stopBackgroundMusic();
         System.out.println("Game Over - No lives remaining");
       } else {
         obstacles.resume();
@@ -125,6 +153,7 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
   public void keyTyped(KeyEvent e) {
     if(e.getKeyChar() == ' ') {    
       if(gameOver) {
+        stopBackgroundMusic();
         if (gameOverListener != null) {
           gameOverListener.onGameOver();
         }
