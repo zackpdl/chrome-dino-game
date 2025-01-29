@@ -77,8 +77,33 @@ public class Obstacles {
     
     if(firstOb.x < -firstOb.image.getWidth()) {
       obList.remove(firstOb);
-      firstOb.x = obList.get(obList.size() - 1).x + obstacleInterval;
+      firstOb.x = lastOb.x + obstacleInterval;
+      firstOb.destroyed = false; // Reset destroyed state
       obList.add(firstOb);
+    }
+
+    // Check for destroyed obstacles and replace them
+    for (int i = 0; i < obList.size(); i++) {
+      Obstacle ob = obList.get(i);
+      if (ob.destroyed) {
+        // Find the last non-destroyed obstacle's position
+        int lastX = 0;
+        for (Obstacle other : obList) {
+          if (!other.destroyed && other.x > lastX) {
+            lastX = other.x;
+          }
+        }
+        
+        // Create new obstacle
+        Obstacle newOb = new Obstacle();
+        newOb.image = imageList.get((int)(Math.random() * imageList.size()));
+        newOb.x = lastX + obstacleInterval;
+        newOb.y = Ground.GROUND_Y - newOb.image.getHeight() + 5;
+        newOb.destroyed = false;
+        
+        // Replace the destroyed obstacle
+        obList.set(i, newOb);
+      }
     }
   }
 

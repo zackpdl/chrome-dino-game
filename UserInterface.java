@@ -6,6 +6,8 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import components.MainMenu;
 
+
+
 public class UserInterface {
   JFrame mainWindow = new JFrame("T-Rex Run");
   private MainMenu mainMenu;

@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.sound.sampled.*;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 
 public class MainMenu extends JPanel {
     private static final int BUTTON_WIDTH = 200;
@@ -16,6 +18,7 @@ public class MainMenu extends JPanel {
     private JButton startButton;
     private JButton exitButton;
     private Clip backgroundMusic;
+    private BufferedImage backgroundImage;
     
     public MainMenu(int width, int height) {
         this.windowWidth = width;
@@ -24,10 +27,19 @@ public class MainMenu extends JPanel {
         setPreferredSize(new Dimension(width, height));
         setSize(width, height);
         setVisible(true);
+        loadBackgroundImage();
         createButtons();
         initializeBackgroundMusic();
     }
     
+    private void loadBackgroundImage() {
+        try {
+            backgroundImage = ImageIO.read(getClass().getResource("../images/bg.jpg"));
+        } catch (Exception e) {
+            System.out.println("Error loading background image: " + e.getMessage());
+        }
+    }
+
     private void initializeBackgroundMusic() {
         try {
             AudioInputStream audioStream = AudioSystem.getAudioInputStream(getClass().getResource("../sounds/background.wav"));
@@ -87,10 +99,12 @@ public class MainMenu extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.setColor(Color.WHITE);
-        g.fillRect(0, 0, getWidth(), getHeight());
         
-        g.setColor(Color.BLACK);
+        if (backgroundImage != null) {
+            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), null);
+        }
+        
+        g.setColor(Color.WHITE);
         g.setFont(new Font("Arial", Font.BOLD, 40));
         String title = "Chrome Dino Game";
         FontMetrics fm = g.getFontMetrics();
